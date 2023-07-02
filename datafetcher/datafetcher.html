@@ -1,0 +1,56 @@
+<template>
+    <lightning-card title="MuleSoft Data Fetcher">
+        <div class="slds-m-around_medium input__area">
+            <lightning-input type="text" label="ID" onchange={handleInput} value={id}></lightning-input>
+            <lightning-button label="Fetch Data" onclick={fetchJSData} variant="brand"></lightning-button>
+            <lightning-button label="All Data" onclick={fetchAllData} variant="brand"></lightning-button>
+            
+        </div>
+        <template if:true={data}>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Owner</th>
+                        <th>Account ID</th>
+                        <th>First Name</th>
+                        <th>Title</th>
+                        <th>Contact ID</th>
+                        <th>Last Name</th>
+                        <th>Birthdate</th>
+                        <th>Contact Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={data} for:item="contact">
+                        <tr key={contact.Id}>
+                            <td>{contact.Department}</td>
+                            <td>{contact.Owner}</td>
+                            <td>{contact.AccountId}</td>
+                            <td>{contact.FirstName}</td>
+                            <td>{contact.Title}</td>
+                            <td>{contact.Id}</td>
+                            <td>{contact.LastName}</td>
+                            <td>{contact.Birthdate}</td>
+                            <td>{contact.ContactName}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <template if:true={error}>
+            <div class="error">{error}</div>
+        </template>
+
+        <div>
+            <lightning-input label="ID" value={id} onchange={handleInputChange}></lightning-input>
+            <lightning-input label="Department" value={department} onchange={handleInputChange}></lightning-input>
+            <lightning-input label="First Name" value={fname} onchange={handleInputChange}></lightning-input>
+            <lightning-input label="Last Name" value={lname} onchange={handleInputChange}></lightning-input>
+            <lightning-input label="Title" value={title} onchange={handleInputChange}></lightning-input>
+            <lightning-input label="Birthdate" value={Birthdate} onchange={handleInputChange}></lightning-input>
+            <lightning-button label="Update" onclick={UpdateMethod} variant="brand"></lightning-button>
+        </div>
+
+    </lightning-card>
+</template>
