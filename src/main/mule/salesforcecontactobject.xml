@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+    <http:listener-config name="salesforcecontactobject-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="salesforcecontactobject-config" api="salesforcecontactobject.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="137beb80-a38c-4abd-93b0-0b44f6206c34" >
+		<salesforce:basic-connection username="somi_2000@gmail.com" password="somihimo6199" securityToken="cKscd8E6QtzsENxJ29lnxRMC" />
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config1" doc:name="Salesforce Config" doc:id="6d4280d2-db06-4221-9c60-7a0dd2d1150a" >
+		<salesforce:basic-connection username="somi_2000@gmail.com" password="somihimo6199" securityToken="cKscd8E6QtzsENxJ29lnxRMC" />
+	</salesforce:sfdc-config>
+	<flow name="salesforcecontactobject-main">
+        <http:listener config-ref="salesforcecontactobject-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="salesforcecontactobject-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="salesforcecontactobject-console">
+        <http:listener config-ref="salesforcecontactobject-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="salesforcecontactobject-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\update:salesforcecontactobject-config">
+		<ee:transform doc:name="Transform Message" doc:id="a7db2cca-9267-4247-ad9b-acd1d6c099be" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[payload] map (payload01, indexOfPayload01) -> {
+    Id: payload01.Id,
+    AccountId: payload01.AccountId,
+    LastName: payload01.LastName,
+    FirstName: payload01.FirstName,
+    Title: payload01.Title,
+    Department: payload01.Department,
+    Birthdate: payload01.Birthdate
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert doc:name="Upsert" doc:id="f8ae76ec-1c3d-43dc-9901-6c256e45523d" config-ref="Salesforce_Config1" objectType="Contact" externalIdFieldName="Id"/>
+		<ee:transform doc:name="Transform Message" doc:id="a54808e2-6018-486e-9faf-fccd741d24e8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success":200,
+	"message":"success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="#[payload]" />
+    </flow>
+    <flow name="get:\fetch:salesforcecontactobject-config">
+        <salesforce:query-all doc:name="Query all" doc:id="21298c34-b654-4d00-9a7b-01abbee4848d" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[Select Id, Account.Name, AccountId, Title, FirstName, LastName, Name, Department, Birthdate, Owner.Name FROM Contact]]></salesforce:salesforce-query>
+		</salesforce:query-all>
+		<ee:transform doc:name="Transform Message" doc:id="002d2370-0b29-447f-b866-bdcf7b03f676" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Department: payload01.Department,
+	Owner: payload01.Owner[0].Name,
+	AccountId: payload01.AccountId,
+	FirstName: payload01.FirstName,
+	"Account.Name": payload01.Account[0].Name,
+	Title: payload01.Title,
+	Id: payload01.Id,
+	LastName: payload01.LastName,
+	Birthdate: payload01.Birthdate,
+	ContactName: payload01.Name
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="get:\fetch:salesforcecontactobject-config" />
+    </flow>
+    <flow name="get:\fetch\(ID):salesforcecontactobject-config">
+        <logger level="INFO" message="#[attributes.requestUri]" />
+		<salesforce:query doc:name="Query" doc:id="30dfbc51-b127-477a-995b-7ce728c9ee93" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id, Account.Name, AccountId, Title, FirstName, LastName, Name, Department, Birthdate, Owner.Name FROM Contact WHERE Id = ':recID']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	recID : attributes.uriParams.ID
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="e599b170-5a91-485d-a2d4-306ce8d29fe3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Department: payload01.Department,
+	Owner: payload01.Owner[0].Name,
+	AccountId: payload01.AccountId,
+	FirstName: payload01.FirstName,
+	"Account.Name": payload01.Account[0].Name,
+	Title: payload01.Title,
+	Id: payload01.Id,
+	LastName: payload01.LastName,
+	Birthdate: payload01.Birthdate,
+	ContactName: payload01.Name
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="post:\delete:salesforcecontactobject-config">
+        <logger level="INFO" message="post:\delete:salesforcecontactobject-config" />
+    </flow>
+    <flow name="post:\insert:salesforcecontactobject-config">
+        <logger level="INFO" message="post:\insert:salesforcecontactobject-config" />
+    </flow>
+</mule>

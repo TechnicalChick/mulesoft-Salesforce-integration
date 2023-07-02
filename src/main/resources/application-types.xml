@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="create_json" format="json">
+      <types:shape format="weave" example="examples/updateSalesforceRecord.json"><![CDATA[%dw 2.0
+
+type create_json = Array<{|  Department: Null,   Owner: Null,   AccountId: String,   FirstName: Null,   "Account.Name": Null,   Title: Null,   Id: String,   LastName: String,   Birthdate: Null,   ContactName: String|}> {"example": "[{\\\"Department\\\":null,\\\"Owner\\\":null,\\\"AccountId\\\":\\\"0012w00001UZvfCAAT\\\",\\\"FirstName\\\":null,\\\"Account.Name\\\":null,\\\"Title\\\":null,\\\"Id\\\":\\\"0032w000014L1poAAC\\\",\\\"LastName\\\":\\\"Contact1\\\",\\\"Birthdate\\\":null,\\\"ContactName\\\":\\\"Contact1\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a7db2cca-9267-4247-ad9b-acd1d6c099be">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="create_json"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

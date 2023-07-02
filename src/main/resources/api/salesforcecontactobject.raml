@@ -1,0 +1,68 @@
+#%RAML 1.0
+types:
+  NewDataType:
+    type: object
+  Fields:
+    properties:
+      Id?:
+        example: Example
+        type: string
+      Account.Name?:
+        example: Example
+        type: string
+      AccountId?:
+        example: Example
+        type: string
+      Title?:
+        example: Example
+        type: string
+      FirstName?:
+        example: Example
+        type: string
+      LastName?:
+        example: Example
+        type: string
+      ContactName?:
+        example: Example
+        type: string
+      Department?:
+        example: Example
+        type: string
+      Birthdate?:
+        example: Example
+        type: string
+      Owner?:
+        example: Example
+        type: string
+title: ContactInfo
+/fetch:
+  get:
+    responses:
+      "200":
+        body:
+          application/json:
+            items:
+              type: Fields
+/insert:
+  post:
+    responses:
+      "200": {}
+/update:
+  put:
+    responses:
+      "200":
+        body:
+          application/json:
+            items:
+              type: Fields
+/delete:
+  post:
+    responses:
+      "200": {}
+/fetch/{ID}:
+  get:
+    responses:
+      "200":
+        body:
+          application/json:
+            type: Fields
